@@ -1,12 +1,13 @@
 @echo off
 setlocal enableextensions
 cd /d "%~dp0"
-title Deer Isle
+title Banov
 echo ===============================
-echo           DEER ISLE
+echo           BANOV
 echo ===============================
 echo.
 call :makeicon
+call :fetchscripts
 call :updatelist
 call :cleanstale
 call :checkmods
@@ -39,7 +40,7 @@ exit /b 1
 
 :makeicon
 if defined DZ_TEST exit /b 0
-powershell -NoProfile -Command "$d=[Environment]::GetFolderPath('Desktop'); $p=$d+'\Deer Isle.lnk'; if(-not (Test-Path $p)){$s=(New-Object -ComObject WScript.Shell).CreateShortcut($p); $s.TargetPath='%~dp0PLAY_DEERISLE.bat'; $s.WorkingDirectory='%~dp0'; $s.IconLocation='%SystemRoot%\System32\shell32.dll,13'; $s.Save(); Write-Host 'Made a Deer Isle icon on your desktop.'}" 2>nul
+powershell -NoProfile -Command "$d=[Environment]::GetFolderPath('Desktop'); $p=$d+'\Banov.lnk'; if(-not (Test-Path $p)){$s=(New-Object -ComObject WScript.Shell).CreateShortcut($p); $s.TargetPath='%~dp0PLAY_DEERISLE.bat'; $s.WorkingDirectory='%~dp0'; $s.IconLocation='%SystemRoot%\System32\shell32.dll,13'; $s.Save(); Write-Host 'Made a Banov icon on your desktop.'}" 2>nul
 exit /b 0
 
 :updatelist
@@ -138,4 +139,20 @@ echo %1| findstr /r "^[0-9][0-9]*$" >nul
 if errorlevel 1 exit /b 0
 >>mods.chk echo %1
 set /a N+=1
+exit /b 0
+
+:fetchscripts
+rem pull the other scripts from GitHub too, so nothing ever has to be swapped by hand
+if not exist mod_list_url.txt exit /b 0
+set "URL="
+set /p URL=<mod_list_url.txt
+if not defined URL exit /b 0
+set "BASE=%URL:mods.txt=%"
+call :fetchone 2b_START_DAYZ_MENU.bat
+call :fetchone Update_Missing_Mods.bat
+exit /b 0
+:fetchone
+if exist "%1.new" del "%1.new"
+curl.exe -L -f -s -m 25 -o "%1.new" "%BASE%%1"
+if exist "%1.new" move /y "%1.new" "%1" >nul
 exit /b 0
