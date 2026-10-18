@@ -41,3 +41,12 @@ echo DayZ will open to the main menu. Wait until it is fully loaded, then choose
 echo   PLAY  then  DIRECT CONNECT  then type  207.244.245.37:28100  then the server password.
 echo.
 start "" DayZ_BE.exe -name=%NAME% -nosplash -skipIntro "-mod=%MODS%"
+echo DO NOT click Play yet. The game is still loading the map menu.
+echo Pressing Play too early makes the server kick you (Login timed out).
+for /l %%s in (75,-5,5) do (
+echo   Wait... %%s seconds left
+ping -n 6 127.0.0.1 >nul
+)
+echo.
+echo NOW you can click PLAY and connect.
+pause
